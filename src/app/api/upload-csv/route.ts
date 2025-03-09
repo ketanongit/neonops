@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Pool } from 'pg';
 import { parse } from 'papaparse';
+import { CSVRow } from '@/types/types';
 
 export async function POST(request: NextRequest) {
   try {
@@ -52,7 +53,7 @@ export async function POST(request: NextRequest) {
 
     // Parse the CSV file
     const fileContent = await file.text();
-    const { data, errors, meta } = parse<any>(fileContent, {
+    const { data, errors, meta } = parse<CSVRow>(fileContent, {
       header: true,
       skipEmptyLines: true,
       dynamicTyping: true,
@@ -114,17 +115,19 @@ export async function POST(request: NextRequest) {
         message: `Successfully imported ${data.length} rows into ${schemaName}.${tableName}` 
       });
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Rollback transaction on error
       await client.query('ROLLBACK');
-      return NextResponse.json({ error: `Database error: ${error.message}` }, { status: 500 });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      return NextResponse.json({ error: `Database error: ${errorMessage}` }, { status: 500 });
     } finally {
       client.release();
       await pool.end();
     }
 
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error processing upload:', error);
-    return NextResponse.json({ error: `Server error: ${error.message}` }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: `Server error: ${errorMessage}` }, { status: 500 });
   }
 }

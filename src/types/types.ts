@@ -22,3 +22,8 @@ export interface CSVImportResponse {
   error?: string;
   rowsImported?: number;
 }
+
+// New type for CSV data rows
+export interface CSVRow {
+  [key: string]: string | number | boolean | null;
+}

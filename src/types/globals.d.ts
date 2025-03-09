@@ -32,17 +32,23 @@ declare module 'papaparse' {
     encoding?: string;
     worker?: boolean;
     comments?: boolean | string;
-    step?: (results: ParseResult<any>, parser: any) => void;
-    complete?: (results: ParseResult<any>, file: any) => void;
-    error?: (error: ParseError, file: any) => void;
+    step?: (results: ParseResult<unknown>, parser: Parser) => void;
+    complete?: (results: ParseResult<unknown>, file: File) => void;
+    error?: (error: ParseError, file: File) => void;
     download?: boolean;
     skipEmptyLines?: boolean;
-    chunk?: (results: ParseResult<any>, parser: any) => void;
+    chunk?: (results: ParseResult<unknown>, parser: Parser) => void;
     fastMode?: boolean;
     beforeFirstChunk?: (chunk: string) => string | void;
     withCredentials?: boolean;
-    transform?: (value: string, field: string | number) => any;
+    transform?: (value: string, field: string | number) => unknown;
     delimitersToGuess?: string[];
+  }
+
+  export interface Parser {
+    abort: () => void;
+    pause: () => void;
+    resume: () => void;
   }
 
   export function parse<T>(input: string, config?: ParseConfig): ParseResult<T>;

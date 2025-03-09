@@ -109,11 +109,12 @@ export default function Home() {
       } else {
         throw new Error(data.error || "Failed to import CSV data");
       }
-    } catch (error: any) {
-      console.error("Import error:", error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.error("Import error:", errorMessage);
       setResult({
         success: false,
-        message: error.message || "An unknown error occurred"
+        message: errorMessage || "An unknown error occurred"
       });
     } finally {
       setLoading(false);
